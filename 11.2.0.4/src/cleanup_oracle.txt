@@ -1,0 +1,15 @@
+#如果需要清理oracle环境重新安装
+1. 删除安装目录/u01,/u02,/tmp下的oracle的文件
+rm -rf /u01 /u02
+find /tmp -user oracle -delete
+
+2. 以root执行
+
+rm -f /etc/oratab /etc/oraInst.loc
+
+3. 删除oracle用户和组
+userdel -fr oracle
+groupdel oinstall
+groupdel oper
+groupdel dba
+

@@ -1,0 +1,44 @@
+version: 2021.08.11
+update：2022.04.14. fix sed -i error.
+update: 2022.08.29. add NLS_LANG.export NLS_LANG=American_america.ZHS16GBK 
+update: 2022.09.21. ORACLE_HOME/bin放$PATH后面. $PATH前加转义符\.否则把root的PATH加进去了.
+update: 2023.05.04. 修改01脚本 oracle-grid.sh, $USER,$SHELL前面加转义符\
+
+1. 半自动安装oracle11g 单机。
+在linux6， linux 7.
+
+2.需要建目录/stage,把oracle安装包，补丁包（参加: 安装准备文件清单.bmp)上传到/stage
+
+3. 按照编号
+1）以root执行 11g-01-user-env.sh
+2）以root执行 11g-02-db-soft.sh
+3) 03-05 以oracle用户登录执行。
+4）sqlplus / as sysdba @parameter_setting.sql 优化oracle参数
+5) 重启服务器，禁用透明大页生效
+6）根据设置的oracle内存（sga_max_size=sga_target=1/2内存, pga_aggretage=1/3 sga_max_size)
+执行howto_huge_page_calculate.sh
+得到建议的值，修改
+/etc/sysctl.d/98-oraclekernel.conf
+加上建议的值，比如
+Recommended setting: vm.nr_hugepages = 76827
+加上
+vm.nr_hugepages = 76827
+这是150G的sga的值。
+
+重启服务器，确认大页已经启用。
+grep Huge /proc/meminfo
+
+启动数据库，看到如下信息：
+************************ Large Pages Information *******************
+Per process system memlock (soft) limit = UNLIMITED
+ 
+Total Shared Global Region in Large Pages = 150 GB (100%)
+ 
+Large Pages used by this instance: 76801 (150 GB)
+Large Pages unused system wide = 26 (52 MB)
+Large Pages configured system wide = 76827 (150 GB)
+Large Page size = 2048 KB
+********************************************************************
+说明已经启用大页。
+
+
